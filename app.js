@@ -9,26 +9,9 @@ mongoose.connect("mongodb://localhost:27017/hotelHopper", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
-let hotelSchema = new mongoose.Schema({
-  name: String,
-  location: String,
-  country: String,
-  about: String,
-  image: String,
-});
-
-let Hotel = mongoose.model("Hotel", hotelSchema);
+let Hotel = require("./models/hotel");
+let Comment = require("./models/comment");
 app.use(express.static(__dirname + "/public"));
-// Hotel.create({
-//   name: "Aleppo",
-//   location: "Lund",
-//   country: "Sweden",
-//   image:
-//     "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Sheraton_Aleppo_Alp.JPG/360px-Sheraton_Aleppo_Alp.JPG",
-//   about:
-//     "The Sheraton Aleppo Hotel is a former five-star hotel opened in 2007 in the ancient part of Aleppo city, within the historic walls, on Al-Khandaq street, Aqabeh district, near the Bab al-Faraj clock tower.",
-// });
 
 //Rest Routes
 //Index Routes
@@ -36,33 +19,62 @@ app.get("/hotels", (req, res) => {
   Hotel.find({}, function (err, hotels) {
     if (err) console.log(err);
     else {
-      res.render("index", { hotels: hotels });
+      res.render("./hotels/index", { hotels: hotels });
     }
   });
 });
 app.get("/", (req, res) => {
-  res.render("landing");
+  res.render("./hotels/landing");
 });
 
 //New Route
 app.get("/new", (req, res) => {
-  res.render("new");
+  res.render("./hotels/new");
 });
 
 //Create Route
 app.post("/hotels", (req, res) => {
   Hotel.create(req.body.hotel, function (err, createdHotel) {
-    if (err) res.render("new");
+    if (err) res.render("./hotels/new");
     else res.redirect("/hotels");
   });
 });
 
 //Show route
 app.get("/hotels/:id", (req, res) => {
-  Hotel.findById(req.params.id, function (err, hotel) {
-    res.render("show", { hotel: hotel });
+  Hotel.findById(req.params.id)
+    .populate("comments")
+    .exec(function (err, foundHotel) {
+      res.render("./hotels/show", { foundHotel: foundHotel });
+    });
+});
+
+//Comment Route
+app.get("/hotels/:id/comments/new", (req, res) => {
+  Hotel.findById(req.params.id, function (err, foundHotel) {
+    res.render("./comments/new", { foundHotel: foundHotel });
   });
 });
+
+app.post("/hotels/:id/comments", (req, res) => {
+  Hotel.findById(req.params.id, function (err, foundHotel) {
+    if (err) console.log(err);
+    else {
+      Comment.create(req.body.comment, function (err, comment) {
+        if (err) console.log(err);
+        else {
+          comment.save();
+          foundHotel.comments.push(comment);
+          foundHotel.save();
+          res.redirect("/hotels/" + foundHotel._id);
+          console.log(comment);
+          console.log(foundHotel);
+        }
+      });
+    }
+  });
+});
+
 app.listen(3000, () => {
   console.log("Server Running on port 3000!");
 });

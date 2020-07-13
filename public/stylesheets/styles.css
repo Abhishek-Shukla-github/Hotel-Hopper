@@ -7,3 +7,13 @@
 #thumbnail {
   height: 10rem;
 }
+
+#indexCard:hover {
+  -webkit-box-shadow: 3px 6px 26px 5px rgba(75, 77, 47, 0.52);
+  -moz-box-shadow: 3px 6px 26px 5px rgba(75, 77, 47, 0.52);
+  box-shadow: 3px 6px 26px 5px rgba(75, 77, 47, 0.52);
+}
+
+#indexCard a:hover {
+  transform: scale(1.1);
+}

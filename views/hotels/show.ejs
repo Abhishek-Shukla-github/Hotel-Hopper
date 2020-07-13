@@ -1,0 +1,40 @@
+<%- include("./../partials/header.ejs") %>
+<div class="container">
+  <div class="row ">
+    <div class="col-md-9">
+      <div class="thumbnail" >
+        <img
+          class="card-img-top"
+          src="<%= foundHotel.image %>"
+          alt="Card image cap"
+          style="max-height: 40vh;"
+        />
+        <div class="card-body">
+          <h4 class="card-title"><%= foundHotel.name %></h4>
+          <h5 class="text-primary my-2">
+            <%= foundHotel.location %>,<%= foundHotel.country %>
+          </h5>
+          <p class="card-text lead"><%= foundHotel.about %></p>
+        </div>
+      </div>
+      <div class="pull-right well border border-light bg-light mt-5">
+        <div class="text-right p-3 m-3">
+          <a 
+          href="/hotels/<%= foundHotel._id %>/comments/new"
+          class=" btn btn-primary"
+          >Add Comment</a
+        >
+        </div>
+        <% foundHotel.comments.forEach((comment)=>{ %>
+          <div class="row ">
+          <div class="col-md-12">
+            <p class="px-3"><strong><em><%= comment.username %></strong></em>-<%= comment.text %></p>
+            <hr>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include("./../partials/footer.ejs") %>

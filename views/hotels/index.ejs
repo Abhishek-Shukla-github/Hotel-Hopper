@@ -1,9 +1,9 @@
-<%- include ("partials/header.ejs")%>
+<%- include ("./../partials/header.ejs")%>
 <div class="container">
   <h1 class="h1 text-center p-3 m-2">Hotel additions by users:-</h1>
   <div class="row">
     <% hotels.forEach((hotel)=>{ %>
-    <div class="card m-3 p-3" style="width: 20rem;">
+    <div class="card m-3 p-3" id="indexCard" style="width: 20rem;">
       <img
         class="card-img-top"
         id="thumbnail"
@@ -21,4 +21,4 @@
     <%})%>
   </div>
 </div>
-<%- include ("partials/footer.ejs")%>
+<%- include ("./../partials/footer.ejs")%>
