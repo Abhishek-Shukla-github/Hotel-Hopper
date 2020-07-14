@@ -1,7 +1,11 @@
 let express = require("express");
 app = express();
 let bodyParser = require("body-parser");
-let mongoose = require("mongoose");
+let mongoose = require("mongoose"),
+  passport = require("passport"),
+  LocalStrategy = require("passport-local"),
+  passportLocalMongoose = require("passport-local-mongoose");
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(express.static("public"));
@@ -11,7 +15,22 @@ mongoose.connect("mongodb://localhost:27017/hotelHopper", {
 });
 let Hotel = require("./models/hotel");
 let Comment = require("./models/comment");
+let User = require("./models/user");
 app.use(express.static(__dirname + "/public"));
+
+//Passport Setup
+app.use(
+  require("express-session")({
+    secret: "Hotel Hopper",
+    resave: "false",
+    saveUninitialized: false,
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 //Rest Routes
 //Index Routes
@@ -70,6 +89,29 @@ app.post("/hotels/:id/comments", (req, res) => {
           console.log(comment);
           console.log(foundHotel);
         }
+      });
+    }
+  });
+});
+
+//Authentication Routes
+
+//Sign up form
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
+//Signup Logic
+app.post("/register", (req, res) => {
+  let newUser = new User({ username: req.body.username });
+  User.register(newUser, req.body.password, function (err, createdUser) {
+    if (err) {
+      console.log(err);
+      return res.redirect("/register");
+    } else {
+      passport.authenticate("local")(req, res, function () {
+        console.log("Hi" + createdUser);
+        res.redirect("/hotels");
       });
     }
   });

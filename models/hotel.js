@@ -4,6 +4,13 @@ let hotelSchema = new mongoose.Schema({
   name: String,
   location: String,
   country: String,
+  author: {
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    username: String,
+  },
   comments: [
     {
       type: mongoose.Schema.Types.ObjectId,

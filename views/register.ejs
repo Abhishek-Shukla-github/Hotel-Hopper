@@ -1,0 +1,23 @@
+<%- include("./partials/header.ejs") %>
+<div
+  class="container d-flex flex-column justify-content-center" style="width: 50vw;"
+>
+  <form class="container d-flex flex-column justify-content-center h-100 bg-light mt-5 p-3" method="POST" action="/register">
+    <h1 class="mx-auto p-3">Register to Hotel Hopper</h1>
+    <div class="form-group">
+      <input
+      name="username"
+        type="text"
+        class="form-control my-3 p-3"
+        placeholder="Enter username:-"
+      />
+      <input
+      name="password"
+        type="text"
+        class="form-control my-3 p-3"
+        placeholder="Enter password:-"
+      />
+    <button type="submit" class="ml-2 btn btn-primary btn-block">Submit</button>
+  </form>
+</div>
+<%- include("./partials/footer.ejs") %>
