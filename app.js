@@ -42,12 +42,15 @@ app.get("/hotels", (req, res) => {
     }
   });
 });
+
+//Hotel Routes
+
 app.get("/", (req, res) => {
   res.render("./hotels/landing");
 });
 
 //New Route
-app.get("/new", (req, res) => {
+app.get("/new", isLoggedIn, (req, res) => {
   res.render("./hotels/new");
 });
 
@@ -68,13 +71,15 @@ app.get("/hotels/:id", (req, res) => {
     });
 });
 
-//Comment Route
-app.get("/hotels/:id/comments/new", (req, res) => {
+//Comment Routes
+//Displaying form
+app.get("/hotels/:id/comments/new", isLoggedIn, (req, res) => {
   Hotel.findById(req.params.id, function (err, foundHotel) {
     res.render("./comments/new", { foundHotel: foundHotel });
   });
 });
 
+//Creating the comment
 app.post("/hotels/:id/comments", (req, res) => {
   Hotel.findById(req.params.id, function (err, foundHotel) {
     if (err) console.log(err);
@@ -95,7 +100,6 @@ app.post("/hotels/:id/comments", (req, res) => {
 });
 
 //Authentication Routes
-
 //Sign up form
 app.get("/register", (req, res) => {
   res.render("register");
@@ -132,6 +136,17 @@ app.post(
   (req, res) => {}
 );
 
+//Logout Logic
+app.get("/logout", (req, res) => {
+  req.logout();
+  res.redirect("/hotels");
+});
+
 app.listen(3000, () => {
   console.log("Server Running on port 3000!");
 });
+
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) return next();
+  else res.redirect("/login");
+}
