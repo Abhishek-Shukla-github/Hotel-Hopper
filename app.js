@@ -117,6 +117,21 @@ app.post("/register", (req, res) => {
   });
 });
 
+//Login Form
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
+//Login Logic
+app.post(
+  "/login",
+  passport.authenticate("local", {
+    successRedirect: "/hotels",
+    failureRedirect: "/login",
+  }),
+  (req, res) => {}
+);
+
 app.listen(3000, () => {
   console.log("Server Running on port 3000!");
 });
