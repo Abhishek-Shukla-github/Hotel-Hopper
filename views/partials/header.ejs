@@ -42,15 +42,26 @@
           </li>
         </ul>
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link text-light" href="/new">Add Hotel</a>
-          </li>
+          <% if(!currentUser){ %>
           <li class="nav-item">
             <a class="nav-link text-light" href="/login">Log in</a>
           </li>
           <li class="nav-item">
             <a class="nav-link text-light" href="/register">Sign Up</a>
           </li>
+          <% } else{ %>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="#"
+              >Signed in as <%= currentUser.username %></a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="/new">Add Hotel</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-light" href="/logout">Logout</a>
+          </li>
+          <% } %>
         </ul>
       </div>
     </nav>

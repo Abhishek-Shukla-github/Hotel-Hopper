@@ -16,6 +16,7 @@ mongoose.connect("mongodb://localhost:27017/hotelHopper", {
 let Hotel = require("./models/hotel");
 let Comment = require("./models/comment");
 let User = require("./models/user");
+const user = require("./models/user");
 app.use(express.static(__dirname + "/public"));
 
 //Passport Setup
@@ -32,8 +33,19 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+//Navbar Fix
+app.use(function (req, res, next) {
+  res.locals.currentUser = req.user;
+  next();
+});
+
 //Rest Routes
 //Index Routes
+app.get("/", (req, res) => {
+  res.render("./hotels/landing");
+});
+
+//Hotel Routes
 app.get("/hotels", (req, res) => {
   Hotel.find({}, function (err, hotels) {
     if (err) console.log(err);
@@ -43,22 +55,36 @@ app.get("/hotels", (req, res) => {
   });
 });
 
-//Hotel Routes
-
-app.get("/", (req, res) => {
-  res.render("./hotels/landing");
-});
-
 //New Route
 app.get("/new", isLoggedIn, (req, res) => {
-  res.render("./hotels/new");
+  res.render("./hotels/new", { currentUser: req.user });
 });
 
 //Create Route
-app.post("/hotels", (req, res) => {
-  Hotel.create(req.body.hotel, function (err, createdHotel) {
+app.post("/hotels", isLoggedIn, (req, res) => {
+  let name = req.body.name;
+  let location = req.body.location;
+  let country = req.body.country;
+  let about = req.body.about;
+  let image = req.body.image;
+  let author = {
+    id: req.user.id,
+    username: req.user.username,
+  };
+  let hotel = {
+    name: name,
+    location: location,
+    country: country,
+    about: about,
+    image: image,
+    author: author,
+  };
+  Hotel.create(hotel, function (err, createdHotel) {
     if (err) res.render("./hotels/new");
-    else res.redirect("/hotels");
+    else {
+      createdHotel.save();
+      res.redirect("/hotels");
+    }
   });
 });
 
@@ -75,7 +101,10 @@ app.get("/hotels/:id", (req, res) => {
 //Displaying form
 app.get("/hotels/:id/comments/new", isLoggedIn, (req, res) => {
   Hotel.findById(req.params.id, function (err, foundHotel) {
-    res.render("./comments/new", { foundHotel: foundHotel });
+    res.render("./comments/new", {
+      foundHotel: foundHotel,
+      currentUser: req.user,
+    });
   });
 });
 
@@ -87,12 +116,17 @@ app.post("/hotels/:id/comments", (req, res) => {
       Comment.create(req.body.comment, function (err, comment) {
         if (err) console.log(err);
         else {
+          //Adding id and username to comment from the forr
+          comment.author.id = req.user._id;
+          comment.author.username = req.user.username;
+          //saving the comment
           comment.save();
+          //Pushing the comment to the comments array
           foundHotel.comments.push(comment);
           foundHotel.save();
           res.redirect("/hotels/" + foundHotel._id);
-          console.log(comment);
-          console.log(foundHotel);
+          // console.log(comment);
+          // console.log(foundHotel);
         }
       });
     }
