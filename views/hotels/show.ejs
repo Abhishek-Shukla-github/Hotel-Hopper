@@ -16,10 +16,12 @@
           </h5>
           <small>Submitted by <%= foundHotel.author.username %></small>
           <p class="card-text lead"><%= foundHotel.about %></p>
-          <a class="btn btn-warning" href="/hotels/<%= foundHotel._id %>/edit">Edit</a>
-          <form id="Delete"  action="/hotels/<%= foundHotel._id %>?_method=DELETE" method="POST">
-            <button class="btn btn-danger">Delete</button>
-          </form>
+          <% if(currentUser && foundHotel.author.id.equals(currentUser._id)){ %>
+              <a class="btn btn-warning" href="/hotels/<%= foundHotel._id %>/edit">Edit</a>
+            <form id="Delete"  action="/hotels/<%= foundHotel._id %>?_method=DELETE" method="POST">
+              <button class="btn btn-danger">Delete</button>
+            </form>
+          <% } %>
         </div>
       </div>
       <div class="pull-right well border border-light bg-light mt-5">

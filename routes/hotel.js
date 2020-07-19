@@ -57,17 +57,15 @@ router.get("/hotels/:id", (req, res) => {
 
 //Editing the Hotels
 //Displaying the Edit form
-router.get("/hotels/:id/edit", (req, res) => {
+router.get("/hotels/:id/edit", checkUserOwnership, (req, res) => {
+  //Check if user if logged in
   Hotel.findById(req.params.id, function (err, foundHotel) {
-    if (err) res.redirect("/hotels");
-    else {
-      res.render("hotels/edit", { foundHotel: foundHotel });
-    }
+    res.render("hotels/edit", { foundHotel: foundHotel });
   });
 });
 
 //Saving the changes of edit operation
-router.put("/hotels/:id", (req, res) => {
+router.put("/hotels/:id", checkUserOwnership, (req, res) => {
   Hotel.findByIdAndUpdate(req.params.id, req.body.hotel, function (
     err,
     updatedHotel
@@ -80,7 +78,7 @@ router.put("/hotels/:id", (req, res) => {
 });
 
 //Delete Route
-router.delete("/hotels/:id", (req, res) => {
+router.delete("/hotels/:id", checkUserOwnership, (req, res) => {
   Hotel.findByIdAndDelete(req.params.id, function (err, deletedHotel) {
     if (err) res.redirect("/hotels");
     else res.redirect("/hotels");
@@ -91,6 +89,19 @@ router.delete("/hotels/:id", (req, res) => {
 function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) return next();
   else res.redirect("/login");
+}
+
+function checkUserOwnership(req, res, next) {
+  if (req.isAuthenticated()) {
+    Hotel.findById(req.params.id, function (err, foundHotel) {
+      if (err) res.redirect("/hotels");
+      else {
+        if (foundHotel.author.id.equals(req.user._id)) {
+          next();
+        } else res.redirect("back");
+      }
+    });
+  } else res.redirect("back");
 }
 
 module.exports = router;
