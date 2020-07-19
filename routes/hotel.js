@@ -55,6 +55,38 @@ router.get("/hotels/:id", (req, res) => {
     });
 });
 
+//Editing the Hotels
+//Displaying the Edit form
+router.get("/hotels/:id/edit", (req, res) => {
+  Hotel.findById(req.params.id, function (err, foundHotel) {
+    if (err) res.redirect("/hotels");
+    else {
+      res.render("hotels/edit", { foundHotel: foundHotel });
+    }
+  });
+});
+
+//Saving the changes of edit operation
+router.put("/hotels/:id", (req, res) => {
+  Hotel.findByIdAndUpdate(req.params.id, req.body.hotel, function (
+    err,
+    updatedHotel
+  ) {
+    if (err) {
+      console.log("Error");
+      res.redirect("/hotels/" + req.params.id);
+    } else res.redirect("/hotels/" + req.params.id);
+  });
+});
+
+//Delete Route
+router.delete("/hotels/:id", (req, res) => {
+  Hotel.findByIdAndDelete(req.params.id, function (err, deletedHotel) {
+    if (err) res.redirect("/hotels");
+    else res.redirect("/hotels");
+  });
+});
+
 //Middleware to check Login
 function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) return next();

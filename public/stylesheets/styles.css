@@ -17,3 +17,7 @@
 #indexCard a:hover {
   transform: scale(1.1);
 }
+
+#Delete {
+  display: inline;
+}

@@ -3,13 +3,15 @@ let bodyParser = require("body-parser");
 let mongoose = require("mongoose"),
   passport = require("passport"),
   LocalStrategy = require("passport-local"),
-  passportLocalMongoose = require("passport-local-mongoose");
+  passportLocalMongoose = require("passport-local-mongoose"),
+  methodOverride = require("method-override");
 
 let Hotel = require("./models/hotel"),
   Comment = require("./models/comment"),
   User = require("./models/user");
 
 app = express();
+app.use(methodOverride("_method"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(express.static("public"));
