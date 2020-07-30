@@ -36,10 +36,12 @@
           <div class="row ">
           <div class="col-md-12">
             <p class="px-3"><strong><em><%= comment.author.username %></strong></em>-<%= comment.text %></p>
-            <a href="/hotels/<%= foundHotel._id %>/comments/<%= comment._id %>/edit" class="btn btn-warning btn-xs">Edit</a>
-            <form id="deleteComment" action="/hotels/<%= foundHotel._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST">
-              <button class="btn btn-danger btn-xs">Delete</button>
-            </form>
+            <% if(currentUser && comment.author.id.equals(currentUser.id)){ %>
+              <a href="/hotels/<%= foundHotel._id %>/comments/<%= comment._id %>/edit" class="btn btn-warning btn-xs">Edit</a>
+              <form id="deleteComment" action="/hotels/<%= foundHotel._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST">
+                <button class="btn btn-danger btn-xs">Delete</button>
+              </form>
+            <% } %>
             <hr>
           </div>
         </div>

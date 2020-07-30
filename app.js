@@ -4,7 +4,8 @@ let mongoose = require("mongoose"),
   passport = require("passport"),
   LocalStrategy = require("passport-local"),
   passportLocalMongoose = require("passport-local-mongoose"),
-  methodOverride = require("method-override");
+  methodOverride = require("method-override"),
+  flash = require("connect-flash");
 
 let Hotel = require("./models/hotel"),
   Comment = require("./models/comment"),
@@ -25,7 +26,7 @@ let hotelRoutes = require("./routes/hotel"),
   authRoutes = require("./routes/index");
 
 app.use(express.static(__dirname + "/public"));
-
+app.use(flash());
 //Passport Setup
 app.use(
   require("express-session")({
