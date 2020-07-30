@@ -23,6 +23,11 @@ middlewareObj.checkCommentOwnership = function (req, res, next) {
       else {
         if (foundComment.author.id.equals(req.user.id)) {
           next();
+        } else {
+          req.flash(
+            "error",
+            "Cannot perform this operation , please try again :`( !"
+          );
         }
       }
     });
@@ -33,7 +38,8 @@ middlewareObj.checkCommentOwnership = function (req, res, next) {
 
 middlewareObj.isLoggedIn = function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) return next();
-  else res.redirect("/login");
+  req.flash("error", "You must be Logged in to perform this operation");
+  return res.redirect("/login");
 };
 
 module.exports = middlewareObj;

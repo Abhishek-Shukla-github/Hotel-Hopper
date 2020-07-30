@@ -65,6 +65,18 @@
         </ul>
       </div>
     </nav>
+    <!-- //Flash message -->
+    <div class="container">
+      <% if(error && error.length>0) {%>
+      <div class="alert alert-danger" role="alert">
+        <%= error %>
+      </div>
+      <%}%> <% if(success && success.length>0) {%>
+      <div class="alert alert-success" role="alert">
+        <%= success %>
+      </div>
+      <%}%>
+    </div>
     <script
       src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
       integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"

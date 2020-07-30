@@ -18,11 +18,14 @@ router.get("/hotels/:id/comments/new", middleware.isLoggedIn, (req, res) => {
 //Creating the comment
 router.post("/hotels/:id/comments", middleware.isLoggedIn, (req, res) => {
   Hotel.findById(req.params.id, function (err, foundHotel) {
-    if (err) console.log(err);
-    else {
+    if (err) {
+      req.flash("error", "There was an error , please try again");
+      res.redirect("back");
+    } else {
       Comment.create(req.body.comment, function (err, comment) {
-        if (err) console.log(err);
-        else {
+        if (err) {
+          req.flash("error", "Cannot save changes , please try again");
+        } else {
           //Adding id and username to comment from the forr
           comment.author.id = req.user._id;
           comment.author.username = req.user.username;
@@ -31,9 +34,8 @@ router.post("/hotels/:id/comments", middleware.isLoggedIn, (req, res) => {
           //Pushing the comment to the comments array
           foundHotel.comments.push(comment);
           foundHotel.save();
+          req.flash("success", "Comment added! :)");
           res.redirect("/hotels/" + foundHotel._id);
-          // console.log(comment);
-          // console.log(foundHotel);
         }
       });
     }
@@ -47,8 +49,9 @@ router.get(
   middleware.checkCommentOwnership,
   (req, res) => {
     Comment.findById(req.params.comment_id, function (err, foundComment) {
-      if (err) res.redirect("back");
-      else {
+      if (err) {
+        req.flash("error", "You don't have right to perform this operation");
+      } else {
         res.render("comments/edit", {
           foundComment: foundComment,
           hotel_id: req.params.id,
@@ -67,9 +70,12 @@ router.put(
       req.params.comment_id,
       req.body.comment,
       function (err, updatedComment) {
-        if (err) res.redirect("back");
-        else {
-          res.redirect("/hotels/" + req.params.id);
+        if (err) {
+          req.flash("error", "There was an error, please try again");
+          res.redirect("back");
+        } else {
+          req.flash("success", "Changes to the comment saved! :)");
+          req.res.redirect("/hotels/" + req.params.id);
         }
       }
     );
@@ -85,8 +91,16 @@ router.delete(
       err,
       deletedComment
     ) {
-      if (err) res.redirect("/hotels/" + req.params.id);
-      else res.redirect("/hotels/" + req.params.id);
+      if (err) {
+        req.flash(
+          "error",
+          "You don't have the right to perform this operation :("
+        );
+        res.redirect("/hotels/" + req.params.id);
+      } else {
+        req.flash("success", "Comment deleted successfully! :)");
+        res.redirect("/hotels/" + req.params.id);
+      }
     });
   }
 );

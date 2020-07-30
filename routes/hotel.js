@@ -42,6 +42,10 @@ router.post("/hotels", middleware.isLoggedIn, (req, res) => {
     if (err) res.render("./hotels/new");
     else {
       createdHotel.save();
+      req.flash(
+        "success",
+        "Hotel added successfully, thank you for sharing your experience! :)"
+      );
       res.redirect("/hotels");
     }
   });
@@ -72,17 +76,25 @@ router.put("/hotels/:id", middleware.checkHotelOwnership, (req, res) => {
     updatedHotel
   ) {
     if (err) {
-      console.log("Error");
+      req.flash("error", "Error:- " + err + ". Please try again :(");
       res.redirect("/hotels/" + req.params.id);
-    } else res.redirect("/hotels/" + req.params.id);
+    } else {
+      req.flash("success", "Changes to the Hotel saved successfully! :)");
+      res.redirect("/hotels/" + req.params.id);
+    }
   });
 });
 
 //Delete Route
 router.delete("/hotels/:id", middleware.checkHotelOwnership, (req, res) => {
   Hotel.findByIdAndDelete(req.params.id, function (err, deletedHotel) {
-    if (err) res.redirect("/hotels");
-    else res.redirect("/hotels");
+    if (err) {
+      req.flash("error", "There was an error , please try again :(");
+      res.redirect("/hotels");
+    } else {
+      req.flash("success", "Hotel deleted successfully :)");
+      res.redirect("/hotels");
+    }
   });
 });
 
