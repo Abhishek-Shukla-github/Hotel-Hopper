@@ -6,6 +6,7 @@ let mongoose = require("mongoose"),
   passportLocalMongoose = require("passport-local-mongoose"),
   methodOverride = require("method-override"),
   flash = require("connect-flash");
+require("dotenv").config();
 
 let Hotel = require("./models/hotel"),
   Comment = require("./models/comment"),
@@ -16,10 +17,20 @@ app.use(methodOverride("_method"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.use(express.static("public"));
-mongoose.connect("mongodb://localhost:27017/hotelHopper", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+//Mongoose Setup
+console.log("database: " + process.env.DATABASEURL);
+const mongooseConnectString = process.env.DATABASEURL;
+mongoose
+  .connect(mongooseConnectString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Connected to DB " + process.env.DATABASEURL);
+  })
+  .catch((err) => {
+    console.log("ERROR: " + err.message);
+  });
 
 let hotelRoutes = require("./routes/hotel"),
   commentRoutes = require("./routes/comment"),
@@ -30,7 +41,7 @@ app.use(flash());
 //Passport Setup
 app.use(
   require("express-session")({
-    secret: "Hotel Hopper",
+    secret: process.env.SECRET,
     resave: "false",
     saveUninitialized: false,
   })

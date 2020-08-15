@@ -1,22 +1,33 @@
 <%- include("./../partials/header.ejs") %>
 <div
-  class="container d-flex flex-column justify-content-center h-100"
+  class="container d-flex flex-column justify-content-center"
   style="min-height: 100vh;"
 >
   <form class="container d-flex flex-column justify-content-center h-100 bg-light my-5 p-3"
-  style="min-height: 100vh;" method="POST" action="/hotels">
+ method="POST" action="/hotels" enctype="multipart/form-data">
     <h1 class="mx-auto p-3">Add new Hotel!</h1>
     <div class="form-group">
       <input
-      name="name"
+      name="hotel[name]"
         type="text"
         class="form-control my-3 p-3"
         placeholder="Enter name of the hotel:-"
       />
-      <input type="text" name="location" placeholder="Location:-" class="form-control my-3 p-3" />
-      <input type="text" name="country" placeholder="Country:-" class="form-control my-3 p-3" />
-      <textarea name="about" class="form-control my-3 p-3" placeholder="Description of the hotel:-"></textarea>
-      <input type="text" name="image" placeholder="Image URL:-" class="form-control my-3 p-3" />
+      <div class="form-group">
+        <label for="exampleInputEmail1">Image URL</label>
+        <input
+          type="file"
+          name="image"
+          class="form-control"
+          id="image"
+          accept="image/*"
+          required
+        />
+  
+      <input type="text" name="hotel[location]" placeholder="Location:-" class="form-control my-3 p-3" />
+      <input type="text" name="hotel[country]" placeholder="Country:-" class="form-control my-3 p-3" />
+      <textarea name="hotel[about]" class="form-control my-3 p-3" placeholder="Description of the hotel:-"></textarea>
+      
     <button type="submit" class="ml-2 btn btn-primary btn-block">Submit</button>
   </form>
 </div>

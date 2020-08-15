@@ -2,6 +2,29 @@ let express = require("express");
 let router = express.Router();
 let Hotel = require("./../models/hotel");
 let middleware = require("../middleware/index");
+let multer = require("multer");
+require("dotenv").config();
+
+let storage = multer.diskStorage({
+  filename: function (req, file, callback) {
+    callback(null, Date.now() + file.originalname);
+  },
+});
+let imageFilter = function (req, file, cb) {
+  // accept image files only
+  if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
+    return cb(new Error("Only image files are allowed!"), false);
+  }
+  cb(null, true);
+};
+let upload = multer({ storage: storage, fileFilter: imageFilter });
+
+let cloudinary = require("cloudinary");
+cloudinary.config({
+  cloud_name: "prof-noob123",
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 //Rest Routes
 // Hotel Routes
@@ -20,36 +43,42 @@ router.get("/hotels/new", middleware.isLoggedIn, (req, res) => {
 });
 
 //Create Route
-router.post("/hotels", middleware.isLoggedIn, (req, res) => {
-  let name = req.body.name;
-  let location = req.body.location;
-  let country = req.body.country;
-  let about = req.body.about;
-  let image = req.body.image;
-  let author = {
-    id: req.user.id,
-    username: req.user.username,
-  };
-  let hotel = {
-    name: name,
-    location: location,
-    country: country,
-    about: about,
-    image: image,
-    author: author,
-  };
-  Hotel.create(hotel, function (err, createdHotel) {
-    if (err) res.render("./hotels/new");
-    else {
-      createdHotel.save();
-      req.flash(
-        "success",
-        "Hotel added successfully, thank you for sharing your experience! :)"
-      );
-      res.redirect("/hotels");
-    }
-  });
-});
+router.post(
+  "/hotels",
+  middleware.isLoggedIn,
+  upload.single("image"),
+  (req, res) => {
+    cloudinary.v2.uploader.upload(req.file.path, async function (err, result) {
+      // add cloudinary url for the image to the hotel object under image property
+      if (err) {
+        req.flash("err", "ERROR:- " + err);
+        res.redirect("/hotels");
+      }
+      if (req.file) {
+        try {
+          req.body.hotel.imageId = await result.public_id;
+          req.body.hotel.image = await result.secure_url;
+          console.log("SECURE_URL:- " + result.secure_url);
+        } catch {
+          req.flash("err", "ERROR:- " + err);
+          res.redirect("/");
+        }
+      }
+      // add author to hotel
+      req.body.hotel.author = {
+        id: req.user._id,
+        username: req.user.username,
+      };
+      Hotel.create(req.body.hotel, function (err, newCamp) {
+        if (err) console.log(err);
+        else {
+          req.flash("success", "Successfully created Hotel!");
+          res.redirect("/");
+        }
+      });
+    });
+  }
+);
 
 //Show route
 router.get("/hotels/:id", (req, res) => {
