@@ -4,7 +4,7 @@
   style="min-height: 100vh;"
 >
   <form class="container d-flex flex-column justify-content-center h-100 bg-light my-5 p-3"
-  style="min-height: 100vh;" method="POST" action="/hotels/<%= foundHotel._id %>?_method=PUT">
+  style="min-height: 100vh;" method="POST" action="/hotels/<%= foundHotel._id %>?_method=PUT" enctype="multipart/form-data">
     <h1 class="mx-auto p-3">Edit <span class="text-primary"><%= foundHotel.name %></span></h1>
     <div class="form-group">
       <input
@@ -14,9 +14,18 @@
         value="<%= foundHotel.name %>"
         />
       <input type="text" name="hotel[location]" value="<%= foundHotel.location %>"  class="form-control my-3 p-3" />
+      <div class="form-group">
+        <label for="exampleInputEmail1">Image URL</label>
+        <input
+          type="file"
+          name="image"
+          class="form-control"
+          id="image"
+          accept="image/*"
+        />
+    </div>
       <input type="text" name="hotel[country]"  class="form-control my-3 p-3" value="<%= foundHotel.country %>" />
       <textarea name="hotel[about]" class="form-control my-3 p-3"><%= foundHotel.about%></textarea>
-      <input type="text" name="hotel[image]"  class="form-control my-3 p-3" value="<%= foundHotel.image %>"/>
     <button type="submit" class="ml-2 btn btn-primary btn-block">Submit</button>
   </form>
 </div>

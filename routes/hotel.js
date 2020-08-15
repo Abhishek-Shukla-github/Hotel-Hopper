@@ -58,7 +58,8 @@ router.post(
         try {
           req.body.hotel.imageId = await result.public_id;
           req.body.hotel.image = await result.secure_url;
-          console.log("SECURE_URL:- " + result.secure_url);
+          console.log("SECURE_URL:- " + result.public_id);
+          console.log(req.body.hotel);
         } catch {
           req.flash("err", "ERROR:- " + err);
           res.redirect("/");
@@ -99,30 +100,56 @@ router.get("/hotels/:id/edit", middleware.checkHotelOwnership, (req, res) => {
 });
 
 //Saving the changes of edit operation
-router.put("/hotels/:id", middleware.checkHotelOwnership, (req, res) => {
-  Hotel.findByIdAndUpdate(req.params.id, req.body.hotel, function (
-    err,
-    updatedHotel
-  ) {
-    if (err) {
-      req.flash("error", "Error:- " + err + ". Please try again :(");
-      res.redirect("/hotels/" + req.params.id);
-    } else {
-      req.flash("success", "Changes to the Hotel saved successfully! :)");
-      res.redirect("/hotels/" + req.params.id);
-    }
-  });
-});
+router.put(
+  "/hotels/:id",
+  middleware.checkHotelOwnership,
+  upload.single("image"),
+  function (req, res) {
+    Hotel.findById(req.params.id, async function (err, hotel) {
+      if (err) {
+        req.flash("error", "Not entered: " + err.message);
+        res.redirect("back");
+      } else {
+        if (req.file) {
+          try {
+            await cloudinary.v2.uploader.destroy(hotel.imageId);
+            let result = await cloudinary.v2.uploader.upload(req.file.path);
+            console.log("Public_id:- " + hotel.imageId);
+            hotel.imageId = await result.public_id;
+            hotel.image = await result.secure_url;
+          } catch (err) {
+            req.flash("error", "Catch Block : " + err.message);
+            return res.redirect("back");
+          }
+        }
+        hotel.name = req.body.hotel.name;
+        hotel.country = req.body.hotel.country;
+        hotel.about = req.body.hotel.about;
+        hotel.save();
+        req.flash("success", "Successfully Updated!");
+        res.redirect("/hotels/" + hotel._id);
+      }
+    });
+  }
+);
 
 //Delete Route
-router.delete("/hotels/:id", middleware.checkHotelOwnership, (req, res) => {
-  Hotel.findByIdAndDelete(req.params.id, function (err, deletedHotel) {
+router.delete("/hotels/:id", function (req, res) {
+  Hotel.findById(req.params.id, async function (err, hotel) {
     if (err) {
-      req.flash("error", "There was an error , please try again :(");
+      req.flash("error", err.message);
+      return res.redirect("back");
+    }
+    try {
+      await cloudinary.v2.uploader.destroy(hotel.imageId);
+      hotel.remove();
+      req.flash("success", "Hotel Deleted Successfully deleted successfully!");
       res.redirect("/hotels");
-    } else {
-      req.flash("success", "Hotel deleted successfully :)");
-      res.redirect("/hotels");
+    } catch (err) {
+      if (err) {
+        req.flash("error", err.message);
+        return res.redirect("back");
+      }
     }
   });
 });

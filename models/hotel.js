@@ -19,6 +19,7 @@ let hotelSchema = new mongoose.Schema({
   ],
   about: String,
   image: String,
+  imageId: String,
 });
 
 module.exports = mongoose.model("Hotel", hotelSchema);
