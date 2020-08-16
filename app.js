@@ -38,6 +38,7 @@ let hotelRoutes = require("./routes/hotel"),
 
 app.use(express.static(__dirname + "/public"));
 app.use(flash());
+app.locals.moment = require("moment");
 //Passport Setup
 app.use(
   require("express-session")({
